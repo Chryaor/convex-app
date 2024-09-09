@@ -10,7 +10,7 @@ export function NewToDoForm() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("")
     
-    const createTodo = useMutation(api.function.createTodo);
+    const createTodo = useMutation(api.functions.createTodo);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -1,10 +1,17 @@
 import  {mutation, query} from "./_generated/server"
 import { v } from "convex/values"
+import { requireUser } from "./helpers";
 
 //list out all the todos
 export const listTodos = query({
     handler: async (ctx) => {
-        return await ctx.db.query("todos").collect();
+        const user = await ctx.auth.getUserIdentity();
+        if(!user){
+            throw new Error ("Unauthorized");
+        }
+        return await ctx.db.query("todos")
+        .withIndex("by_user_id", q => q.eq("userId", user.tokenIdentifier))
+        .collect();
     }
 });
 
@@ -16,10 +23,12 @@ export const createTodo = mutation({
         
     },
     handler: async (ctx,args) => {
-        await ctx. db.insert("todos", {
+        const user = await requireUser(ctx);
+        await ctx.db.insert("todos", {
             title: args.title,
             description: args.description,
-            completed:false
+            completed:false,
+            userId: user.tokenIdentifier
         })
     },
 });
@@ -31,6 +40,11 @@ export const updateTodo = mutation({
         completed:v.boolean(),
     },
     handler:async (ctx,args) => {
+        const user = await requireUser(ctx);
+        const todo = await ctx.db.get(args.id);
+        if(todo?.userId !== user.tokenIdentifier) {
+            throw new Error("Unauthorized");
+        }
         await ctx.db.patch(args.id, {
             completed: args.completed
         })
@@ -43,6 +57,11 @@ export const deleteTodo = mutation({
       id: v.id("todos"),
     },
     handler: async (ctx,args) => {
-        await ctx.db.delete(args.id)
+        const user = await requireUser(ctx);
+        const todo = await ctx.db.get(args.id);
+        if(todo?.userId !== user.tokenIdentifier) {
+            throw new Error("Unauthorized");
+        }
+        await ctx.db.delete(args.id);
     }
   });

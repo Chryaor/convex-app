@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ConvexClientProvider } from "./providers";
+import { Providers } from "./providers";
 
 import "./globals.css";
 
@@ -17,9 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ConvexClientProvider>
+        <Providers>
         {children}
-        </ConvexClientProvider>
+        </Providers>
         
       </body>
     </html>

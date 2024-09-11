@@ -1,6 +1,6 @@
 "use client";
 
-import { ConvexReactClient } from "convex/browser";
+import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk} from "convex/react-clerk"
 import {useAuth, ClerkProvider } from "@clerk/nextjs"
 import React from "react";
